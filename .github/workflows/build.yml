@@ -37,6 +37,7 @@ jobs:
         run: |
           pmbootstrap install --password 147147
           pmbootstrap export
+          ls /tmp/postmarketOS-export
           cp /tmp/postmarketOS-export/*.img out/*
 
       - name: Upload artifacts
