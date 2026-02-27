@@ -1,0 +1,63 @@
+name: Calculate Tar.gz SHA512
+on:
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  calculate-tar-sha512:
+    runs-on: ubuntu-latest
+    steps:
+      # 步骤1：下载指定的 tar.gz 文件
+      - name: Download tar.gz file
+        run: |
+          # 定义文件名称和下载地址
+          TAR_FILE="linux-postmarketos-qcom-msm89x7-v6.19.3-r1.tar.gz"
+          DOWNLOAD_URL="https://github.com/aksSuzumiya6666/linux/archive/v6.19.3-r1.tar.gz"
+          
+          # 创建临时目录存放文件
+          mkdir -p ./temp-tar
+          cd ./temp-tar
+          
+          # 下载文件（带重试机制，避免网络问题）
+          retries=3
+          count=0
+          until [ $count -ge $retries ]; do
+            wget -O "$TAR_FILE" "$DOWNLOAD_URL" && break
+            count=$((count+1))
+            echo "Download failed, retrying ($count/$retries)..."
+            sleep 5
+          done
+          
+          # 验证文件是否下载成功
+          if [ ! -f "$TAR_FILE" ]; then
+            echo "Error: Failed to download $TAR_FILE after $retries retries"
+            exit 1
+          fi
+
+      # 步骤2：计算 tar.gz 文件的 SHA512 哈希值
+      - name: Calculate SHA512 of tar.gz file
+        id: get_tar_sha512
+        run: |
+          cd ./temp-tar
+          TAR_FILE="linux-postmarketos-qcom-msm89x7-v6.19.3-r0.tar.gz"
+          # 计算文件的 SHA512 哈希（仅保留纯哈希值）
+          tar_sha512=$(sha512sum "$TAR_FILE" | awk '{print $1}')
+          
+          # 输出到日志
+          echo "======================================"
+          echo "File name: $TAR_FILE"
+          echo "SHA512 sum: $tar_sha512"
+          echo "======================================"
+          
+          # 保存为步骤输出，供后续使用
+          echo "tar_sha512=$tar_sha512" >> $GITHUB_OUTPUT
+
+      # 步骤3：输出和你示例中格式一致的 sha512sums 内容
+      - name: Print final sha512sums format
+        run: |
+          TAR_SHA512="${{ steps.get_tar_sha512.outputs.tar_sha512 }}"
+          CONFIG_SHA512="b31849704d81798736d6d33d04ea6e1e2b05b2019ae16a276dfa69144c65c9691701a0098aca711adc16241d863cb67f361165b585b977061713becf3afa08b3"
+          
+          echo "sha512sums=\""
+          echo "$TAR_SHA512  linux-postmarketos-qcom-msm89x7-v6.19.3-r0.tar.gz"
+          echo "$CONFIG_SHA512  config-postmarketos-qcom-msm89x7.aarch64"
+          echo "\""
