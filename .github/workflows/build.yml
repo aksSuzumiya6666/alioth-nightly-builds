@@ -29,7 +29,6 @@ jobs:
       - name: Set up pmaports
         run: |
           mkdir -p ~/.config
-          cp qcom-89x7.cfg ~/.config/pmbootstrap_v3.cfg
           printf '\n\n\nqcom\nmsm89x7\n' | pmbootstrap init || true
 
       - name: Build qcom-msm89x7
