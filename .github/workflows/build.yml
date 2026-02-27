@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 0 * * 5" # Run every friday at midnight
 
+env:
+  KERNEL_BRANCH: 6.19.3
+
 jobs:
   build-image:
     runs-on: ubuntu-latest
@@ -27,17 +30,17 @@ jobs:
         run: |
           mkdir -p ~/.config
           cp qcom-89x7.cfg ~/.config/pmbootstrap_v3.cfg
-          printf '\n\n\nqcom\n89x7\n' | pmbootstrap init || true
+          printf '\n\n\nqcom\nmsm89x7\n' | pmbootstrap init || true
 
-      - name: Build qcom-89x7
+      - name: Build qcom-msm89x7
         run: |
           pmbootstrap install --password 147147
           pmbootstrap export
-          cp /tmp/postmarketOS-export/qcom-89x7.img out/rootfs-qcom-89x7.img
+          cp /tmp/postmarketOS-export/qcom-msm89x7.img out/rootfs-qcom-msm89x7.img
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: qcom-89x7
-          path: out/*-89x7.img*
+          name: qcom-msm89x7
+          path: out/*-msm89x7.img*
           retention-days: 7
