@@ -43,5 +43,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: qcom-msm89x7
-          path: out/*-msm89x7.img*
+          path: out/*.img
           retention-days: 7
