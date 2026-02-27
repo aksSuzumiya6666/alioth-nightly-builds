@@ -38,7 +38,7 @@ jobs:
           pmbootstrap install --password 147147
           pmbootstrap export
           ls /tmp/postmarketOS-export
-          cp /tmp/postmarketOS-export/*.img out/*
+          mv /tmp/postmarketOS-export/*.img out/
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
