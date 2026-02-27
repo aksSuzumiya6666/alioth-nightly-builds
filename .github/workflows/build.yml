@@ -5,9 +5,6 @@ on:
   schedule:
     - cron: "0 0 * * 5" # Run every friday at midnight
 
-env:
-  KERNEL_BRANCH: 6.19.3
-
 jobs:
   build-image:
     runs-on: ubuntu-latest
@@ -30,35 +27,10 @@ jobs:
         run: |
           mkdir -p ~/.config
           cp qcom-89x7.cfg ~/.config/pmbootstrap_v3.cfg
-          pmbootstrap init
-          cd ~/.local/var/pmbootstrap/cache_git/pmaports
-          git pull
-
-      - name: Clone kernel sources
-        run: |
-          git clone https://github.com/aksSuzumiya6666/linux.git --single-branch --branch msm89x7/6.19.3 --depth 1 ./linux
-
-      - name: Choose any 89x7 device in pmbootstrap to build kernel
-        run: |
-          mkdir -p ~/.config
-          cp qcom-89x7.cfg ~/.config/pmbootstrap_v3.cfg
-
-      - name: Compile kernel with envkernel
-        run: |
-          cd linux
-          shopt -s expand_aliases
-          source ../pmbootstrap/helpers/envkernel.sh
-          make defconfig config-postmarketos-qcom-msm89x7
-          make -j$(nproc)
-          pmbootstrap build --envkernel linux-postmarketos-qcom-msm89x7
-
-      - name: Create artifact directory
-        run: |
-          mkdir out
+          printf '\n\n\nqcom\n89x7\n' | pmbootstrap init || true
 
       - name: Build qcom-89x7
         run: |
-          cp qcom-89x7.cfg ~/.config/pmbootstrap_v3.cfg
           pmbootstrap install --password 147147
           pmbootstrap export
           cp /tmp/postmarketOS-export/qcom-89x7.img out/rootfs-qcom-89x7.img
